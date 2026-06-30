@@ -4,7 +4,14 @@ import { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { Category } from "@/lib/types";
 import { Eyebrow, Loading, Empty, ErrorNote } from "@/components/ui";
-import { Plus, Trash2, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Modal } from "@/components/Modal";
+import {
+  Plus,
+  Trash2,
+  Pencil,
+  ArrowUpRight,
+  ArrowDownRight,
+} from "lucide-react";
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -13,6 +20,9 @@ export default function CategoriesPage() {
   const [type, setType] = useState<"income" | "expense">("expense");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const [editing, setEditing] = useState<Category | null>(null);
+  const [eName, setEName] = useState("");
 
   const load = useCallback(async () => {
     try {
@@ -51,6 +61,25 @@ export default function CategoriesPage() {
       setError(err.message);
     }
   };
+  const openEdit = (c: Category) => {
+    setEditing(c);
+    setEName(c.name);
+  };
+  const saveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (!editing) return;
+    try {
+      await api(`/categories/${editing._id}`, {
+        method: "PATCH",
+        body: { name: eName },
+      });
+      setEditing(null);
+      await load();
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
 
   return (
     <div className="stack-lg">
@@ -67,8 +96,8 @@ export default function CategoriesPage() {
 
       {showForm && (
         <div className="panel">
-          <form onSubmit={add} className="row">
-            <div className="field" style={{ flex: 1, minWidth: 180 }}>
+          <form onSubmit={add} className="form-grid">
+            <div className="field wide">
               <label>Name</label>
               <input
                 value={name}
@@ -78,7 +107,7 @@ export default function CategoriesPage() {
                 required
               />
             </div>
-            <div className="field" style={{ width: 160 }}>
+            <div className="field">
               <label>Type</label>
               <select
                 value={type}
@@ -88,7 +117,9 @@ export default function CategoriesPage() {
                 <option value="income">Income</option>
               </select>
             </div>
-            <button className="btn primary">Add</button>
+            <div className="form-submit">
+              <button className="btn primary">Add</button>
+            </div>
           </form>
         </div>
       )}
@@ -114,16 +145,44 @@ export default function CategoriesPage() {
               </div>
               <div className="cat-card-foot">
                 <span className={`tag ${c.type}`}>{c.type}</span>
-                <button
-                  className="btn danger-ghost"
-                  onClick={() => remove(c._id)}
-                >
-                  <Trash2 size={15} />
-                </button>
+                <span className="row-actions">
+                  <button
+                    className="btn edit-ghost"
+                    onClick={() => openEdit(c)}
+                    title="Edit"
+                  >
+                    <Pencil size={15} />
+                  </button>
+                  <button
+                    className="btn danger-ghost"
+                    onClick={() => remove(c._id)}
+                    title="Delete"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </span>
               </div>
             </div>
           ))}
         </div>
+      )}
+
+      {editing && (
+        <Modal title="Edit category" onClose={() => setEditing(null)}>
+          <form onSubmit={saveEdit}>
+            <div className="field">
+              <label>Name</label>
+              <input
+                value={eName}
+                onChange={(e) => setEName(e.target.value)}
+                maxLength={20}
+                required
+              />
+            </div>
+            <p className="hint">Type can&apos;t be changed after creation.</p>
+            <button className="btn primary">Save changes</button>
+          </form>
+        </Modal>
       )}
     </div>
   );

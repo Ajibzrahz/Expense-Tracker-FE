@@ -11,7 +11,8 @@ import {
   money,
   shortDate,
 } from "@/components/ui";
-import { Trash2, Plus } from "lucide-react";
+import { Modal } from "@/components/Modal";
+import { Trash2, Plus, Pencil } from "lucide-react";
 
 export default function TransactionsPage() {
   const [items, setItems] = useState<Transaction[]>([]);
@@ -26,6 +27,11 @@ export default function TransactionsPage() {
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+
+  // edit modal state (backend only allows amount + description)
+  const [editing, setEditing] = useState<Transaction | null>(null);
+  const [eAmount, setEAmount] = useState("");
+  const [eDesc, setEDesc] = useState("");
 
   const load = useCallback(async () => {
     try {
@@ -46,6 +52,13 @@ export default function TransactionsPage() {
     load();
   }, [load]);
 
+  // category dropdown filtered by selected type
+  const categoriesForType = categories.filter((c) => c.type === type);
+  useEffect(() => {
+    const match = categories.filter((c) => c.type === type);
+    setCategory(match[0]?._id || "");
+  }, [type, categories]);
+
   const catName = (cat: string | Category) => {
     const id = typeof cat === "object" ? cat?._id : cat;
     return (
@@ -53,13 +66,6 @@ export default function TransactionsPage() {
       (typeof cat === "object" ? cat?.name : "—")
     );
   };
-  // categories that match the currently-selected type
-  const categoriesForType = categories.filter((c) => c.type === type);
-  useEffect(() => {
-    // when type switches, pick the first matching category (or clear)
-    const match = categories.filter((c) => c.type === type);
-    setCategory(match[0]?._id || "");
-  }, [type, categories]);
 
   const add = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +96,26 @@ export default function TransactionsPage() {
       setError(err.message);
     }
   };
+  const openEdit = (t: Transaction) => {
+    setEditing(t);
+    setEAmount(String(t.amount));
+    setEDesc(t.description || "");
+  };
+  const saveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (!editing) return;
+    try {
+      await api(`/transactions/${editing._id}`, {
+        method: "PUT",
+        body: { amount: Number(eAmount), description: eDesc },
+      });
+      setEditing(null);
+      await load();
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
 
   const shown =
     filter === "all" ? items : items.filter((t) => t.type === filter);
@@ -112,8 +138,8 @@ export default function TransactionsPage() {
           <div className="panel-h">
             <h3>Add transaction</h3>
           </div>
-          <form onSubmit={add} className="row">
-            <div className="field" style={{ width: 130 }}>
+          <form onSubmit={add} className="form-grid">
+            <div className="field">
               <label>Amount</label>
               <input
                 type="number"
@@ -124,7 +150,7 @@ export default function TransactionsPage() {
                 required
               />
             </div>
-            <div className="field" style={{ width: 130 }}>
+            <div className="field">
               <label>Type</label>
               <select
                 value={type}
@@ -134,7 +160,7 @@ export default function TransactionsPage() {
                 <option value="income">Income</option>
               </select>
             </div>
-            <div className="field" style={{ width: 170 }}>
+            <div className="field">
               <label>Category</label>
               <select
                 value={category}
@@ -151,7 +177,7 @@ export default function TransactionsPage() {
                 ))}
               </select>
             </div>
-            <div className="field" style={{ flex: 1, minWidth: 150 }}>
+            <div className="field wide">
               <label>Description</label>
               <input
                 value={description}
@@ -160,7 +186,7 @@ export default function TransactionsPage() {
                 maxLength={1000}
               />
             </div>
-            <div className="field" style={{ width: 150 }}>
+            <div className="field">
               <label>Date</label>
               <input
                 type="date"
@@ -168,7 +194,9 @@ export default function TransactionsPage() {
                 onChange={(e) => setDate(e.target.value)}
               />
             </div>
-            <button className="btn primary">Add</button>
+            <div className="form-submit">
+              <button className="btn primary">Add</button>
+            </div>
           </form>
         </div>
       )}
@@ -219,18 +247,60 @@ export default function TransactionsPage() {
                     {shortDate(t.date)}
                   </td>
                   <td className="right">
-                    <button
-                      className="btn danger-ghost"
-                      onClick={() => remove(t._id)}
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <span className="row-actions">
+                      <button
+                        className="btn edit-ghost"
+                        onClick={() => openEdit(t)}
+                        title="Edit"
+                      >
+                        <Pencil size={15} />
+                      </button>
+                      <button
+                        className="btn danger-ghost"
+                        onClick={() => remove(t._id)}
+                        title="Delete"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </span>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      )}
+
+      {editing && (
+        <Modal title="Edit transaction" onClose={() => setEditing(null)}>
+          <form onSubmit={saveEdit}>
+            <div className="field">
+              <label>Amount</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={eAmount}
+                onChange={(e) => setEAmount(e.target.value)}
+                required
+              />
+            </div>
+            <div className="field">
+              <label>Description</label>
+              <input
+                value={eDesc}
+                onChange={(e) => setEDesc(e.target.value)}
+                placeholder="Optional"
+                maxLength={1000}
+              />
+            </div>
+            <p className="hint">
+              Type, category, and date can&apos;t be changed after creation —
+              delete and re-add to change those.
+            </p>
+            <button className="btn primary">Save changes</button>
+          </form>
+        </Modal>
       )}
     </div>
   );
