@@ -62,7 +62,7 @@ h4 {
 }
 
 .mono {
-  font-family: "Space Mono", monospace;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-variant-numeric: tabular-nums;
 }
 .muted {
@@ -492,7 +492,7 @@ input::placeholder {
   color: var(--muted);
 }
 .kpi .val {
-  font-family: "Space Mono", monospace;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-variant-numeric: tabular-nums;
   font-size: 30px;
   font-weight: 700;
@@ -613,7 +613,7 @@ table.tbl {
   background: var(--slate-2);
 }
 .tbl .amt {
-  font-family: "Space Mono", monospace;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-variant-numeric: tabular-nums;
   text-align: right;
   font-weight: 700;
@@ -733,7 +733,7 @@ table.tbl {
   color: var(--muted);
 }
 .bud-pct {
-  font-family: "Space Mono", monospace;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-weight: 700;
 }
 
