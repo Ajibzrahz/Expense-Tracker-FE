@@ -13,7 +13,8 @@
              eyebrow labels with a lime tick.
    ========================================================= */
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap");
+
 :root {
   --ink: #0e1014;
   --slate: #161a21;
@@ -55,10 +56,11 @@ h2,
 h3,
 h4 {
   margin: 0;
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
+
 .mono {
   font-family: "Space Mono", monospace;
   font-variant-numeric: tabular-nums;
@@ -280,7 +282,7 @@ input::placeholder {
   display: inline-flex;
   align-items: center;
   gap: 11px;
-  font-family: "Fraunces", serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-weight: 600;
   font-size: 20px;
 }
@@ -302,6 +304,54 @@ input::placeholder {
   display: grid;
   grid-template-columns: 248px 1fr;
   min-height: 100vh;
+}
+.content-col {
+  display: flex;
+  flex-direction: column;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 48px;
+  height: 64px;
+  border-bottom: 1px solid var(--line);
+  background: var(--ink);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: var(--slate);
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.14s;
+}
+.icon-btn:hover {
+  color: var(--text);
+  border-color: var(--muted-dim);
+}
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: var(--lime);
+  color: #11140a;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 .side {
   background: var(--slate);
@@ -364,7 +414,7 @@ input::placeholder {
 }
 
 .main {
-  padding: 40px 48px;
+  padding: 36px 48px;
   max-width: 1180px;
 }
 .page-top {
@@ -454,6 +504,77 @@ input::placeholder {
 }
 .kpi .val.expense {
   color: var(--coral);
+}
+.kpi-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.kpi-ic {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: var(--slate-2);
+  color: var(--muted);
+}
+.kpi-ic.income {
+  background: rgba(198, 242, 78, 0.14);
+  color: var(--lime);
+}
+.kpi-ic.expense {
+  background: rgba(255, 107, 91, 0.14);
+  color: var(--coral);
+}
+
+/* ---------- category cards ---------- */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+.cat-card {
+  background: var(--slate);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color 0.14s;
+}
+.cat-card:hover {
+  border-color: var(--muted-dim);
+}
+.cat-card-top {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.cat-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.cat-dot.income {
+  background: rgba(198, 242, 78, 0.18);
+}
+.cat-dot.expense {
+  background: rgba(255, 107, 91, 0.18);
+}
+.cat-card .nm {
+  font-weight: 600;
+  font-size: 15px;
+  flex: 1;
+}
+.cat-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /* ---------- table ---------- */
@@ -582,7 +703,7 @@ table.tbl {
   margin-bottom: 14px;
 }
 .bud-top .nm {
-  font-family: "Fraunces", serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 18px;
   font-weight: 600;
 }
@@ -702,6 +823,9 @@ table.tbl {
     border: none;
     padding: 0;
     flex-direction: row;
+  }
+  .topbar {
+    padding: 0 24px;
   }
   .main {
     padding: 24px;
