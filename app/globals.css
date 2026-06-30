@@ -352,6 +352,11 @@ input::placeholder {
   place-items: center;
   font-weight: 700;
   font-family: "Plus Jakarta Sans", sans-serif;
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+.avatar:hover {
+  transform: translateY(-1px);
 }
 .side {
   background: var(--slate);
